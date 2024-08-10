@@ -70,6 +70,29 @@ class WeatherService {
     }
   }
 
+  private destructureLocationData(locationData: any): Coordinates {
+    return {
+      latitude: locationData.lat,
+      longitude: locationData.lon,
+    };
+  }
+
+  private buildGeocodeQuery(): string {
+    return `${this.cityName}&limit=1&apiKey=${this.apiKey}`;
+  }
+
+  private buildWeatherQuery(coordinates: Coordinates): string {
+    return `${this.baseURL}/weather?lat=${coordinates.latitude}&lon=${coordinates.longitude}&apiKey=${this.apiKey}`;
+  }
+
+  private async fetchAndDestructureLocationData(): Promise<Coordinates | null> {
+    const locationData = await this.fetchLocationData(this.cityName!);
+    if (locationData) {
+      return this.destructureLocationData(locationData);
+    }
+    return null;
+  }
+
   
 }
 
