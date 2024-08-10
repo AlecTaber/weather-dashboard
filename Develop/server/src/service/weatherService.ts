@@ -93,7 +93,45 @@ class WeatherService {
     return null;
   }
 
-  
+  private async fetchWeatherData(coordinates: Coordinates): Promise<any> {
+    try {
+      const response = await fetch(this.buildWeatherQuery(coordinates));
+      return await response.json();
+    } catch (err) {
+      console.log('Error:', err);
+      return null;
+    }
+  }
+
+  private parseCurrentWeather(response: any): Weather {
+    return new Weather(
+      response.main.temp,
+      response.weather[0].description,
+      response.main.humidity,
+      response.wind.speed
+    );
+  }
+
+  private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] {
+    return weatherData.map((data) =>
+      new Weather(
+        data.main.temp,
+        data.weather[0].description,
+        data.main.humidity,
+        data.wind.speed
+      )
+    );
+  }
+
+  async getWeatherForCity(city: string): Promise<Weather | null> {
+    this.cityName = city;
+    const coordinates = await this.fetchAndDestructureLocationData();
+    if (coordinates) {
+      const weatherData = await this.fetchWeatherData(coordinates);
+      return this.parseCurrentWeather(weatherData);
+    }
+    return null;
+  }
 }
 
 export default new WeatherService();
