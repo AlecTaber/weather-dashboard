@@ -48,6 +48,29 @@ class WeatherService {
   // private buildForecastArray(currentWeather: Weather, weatherData: any[]) {}
   // TODO: Complete getWeatherForCity method
   // async getWeatherForCity(city: string) {}
+
+  private baseURL?: string;
+  private apiKey?: string;
+  private cityName?: string;
+
+  constructor() {
+    this.baseURL = process.env.WEATHER_API_BASE_URL || '';
+    this.apiKey = process.env.WEATHER_API_KEY || '';
+  }
+
+  private async fetchLocationData(query: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `${this.baseURL}/geocode?q=${query}&apiKey=${this.apiKey}`
+      );
+      return await response.json();
+    } catch (err) {
+      console.log('Error:', err);
+      return null;
+    }
+  }
+
+  
 }
 
 export default new WeatherService();
