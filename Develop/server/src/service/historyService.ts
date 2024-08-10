@@ -35,6 +35,18 @@ private async write(cities: City[]) {
     );
   };
 
+  async getCities() {
+    return await this.read().then((cities) => {
+      let parsedCities: City[];
+
+      try {
+        parsedCities = JSON.parse(cities);
+      } catch (error) {
+        parsedCities = [];
+      }
+      return parsedCities;
+  });
+
   
 }
 export default new HistoryService();
