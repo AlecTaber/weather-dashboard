@@ -47,6 +47,26 @@ private async write(cities: City[]) {
       return parsedCities;
   });
 
-  
+  async addCity(city: string) {
+    if (!city) {
+      throw new Error('City name is required');
+    }
+    const newCity: City = {name: City, id: uuidv4() };
+  }
+  return await this.getCities()
+  .then((cities) => {
+    if (cities.find((index) => index.name === city)) {
+      return cities;
+    }
+  })
+  .then((updatedCities) => this.write(updatedCities))
+  .then (() => newCity);
+
+  async removeCity(id: string) {
+    return await this.getCities()
+    .then((cities) => cities.filter((city) => city.id !== id))
+    .then((filteredCities) => this.write(filteredCities));
+  }
 }
+
 export default new HistoryService();
