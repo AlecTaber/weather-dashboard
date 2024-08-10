@@ -1,4 +1,13 @@
 // TODO: Define a City class with name and id properties
+class City {
+  name: string;
+  id: string;
+
+  constructor(name: string, id: string) {
+    this.name = name;
+    this.id = id;
+  }
+}
 
 // TODO: Complete the HistoryService class
 class HistoryService {
@@ -12,6 +21,20 @@ class HistoryService {
   // async addCity(city: string) {}
   // * BONUS TODO: Define a removeCity method that removes a city from the searchHistory.json file
   // async removeCity(id: string) {}
+  private async read() {
+    return await FileSystem.readFile('searchHistory.json', {
+      flag: 'a+',
+      encoding: 'utf8',
+    });
 }
 
+private async write(cities: City[]) {
+    return await FileSystem.writeFile(
+      'db/searchHistory.json',
+      JSON.stringify(cities, null, '\t')
+    );
+  };
+
+  
+}
 export default new HistoryService();
