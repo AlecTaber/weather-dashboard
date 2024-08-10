@@ -58,7 +58,8 @@ class WeatherService {
     this.apiKey = process.env.WEATHER_API_KEY || '';
   }
 
-  private async fetchLocationData(query: string): Promise<any> {
+  private async fetchLocationData(): Promise<any> {
+    const query = this.buildGeocodeQuery();
     try {
       const response = await fetch(
         `${this.baseURL}/geocode?q=${query}&apiKey=${this.apiKey}`
@@ -86,7 +87,7 @@ class WeatherService {
   }
 
   private async fetchAndDestructureLocationData(): Promise<Coordinates | null> {
-    const locationData = await this.fetchLocationData(this.cityName!);
+    const locationData = await this.fetchLocationData();
     if (locationData) {
       return this.destructureLocationData(locationData);
     }
@@ -113,25 +114,47 @@ class WeatherService {
   }
 
   private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] {
-    return weatherData.map((data) =>
-      new Weather(
+    // Create an array with the current weather as the first element
+    const forecastArray: Weather[] = [currentWeather];
+  
+    // Loop through the weatherData and push each forecasted Weather object into the array
+    weatherData.forEach((data) => {
+      const forecastedWeather = new Weather(
         data.main.temp,
         data.weather[0].description,
         data.main.humidity,
         data.wind.speed
-      )
-    );
+      );
+      forecastArray.push(forecastedWeather);
+    });
+  
+    return forecastArray;
   }
 
-  async getWeatherForCity(city: string): Promise<Weather | null> {
+  async getWeatherForCity(city: string): Promise<Weather[] | null> {
     this.cityName = city;
     const coordinates = await this.fetchAndDestructureLocationData();
     if (coordinates) {
       const weatherData = await this.fetchWeatherData(coordinates);
-      return this.parseCurrentWeather(weatherData);
+      if (!weatherData || !weatherData.main) {
+        console.log('Weather data is missing or incomplete.');
+        return null;
+      }
+  
+      const currentWeather = this.parseCurrentWeather(weatherData);
+  
+      if (weatherData.forecast && Array.isArray(weatherData.forecast)) {
+        return this.buildForecastArray(currentWeather, weatherData.forecast);
+      } else if (weatherData.daily && Array.isArray(weatherData.daily)) {
+        return this.buildForecastArray(currentWeather, weatherData.daily);
+      } else {
+        console.log('No forecast data available.');
+        return [currentWeather]; // Return just the current weather if no forecast data is available
+      }
     }
     return null;
   }
+
 }
 
 export default new WeatherService();
