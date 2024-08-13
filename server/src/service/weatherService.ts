@@ -62,7 +62,7 @@ class WeatherService {
     const query = this.buildGeocodeQuery();
     try {
       const response = await fetch(
-        `${this.baseURL}/geocode?q=${query}&apiKey=${this.apiKey}`
+        `${this.baseURL}/geocode?q=${query}&appid=${this.apiKey}`
       );
       return await response.json();
     } catch (err) {
@@ -79,11 +79,11 @@ class WeatherService {
   }
 
   private buildGeocodeQuery(): string {
-    return `${this.cityName}&limit=1&apiKey=${this.apiKey}`;
+    return `${this.cityName}&limit=1&appid=${this.apiKey}`;
   }
 
   private buildWeatherQuery(coordinates: Coordinates): string {
-    return `${this.baseURL}/weather?lat=${coordinates.latitude}&lon=${coordinates.longitude}&apiKey=${this.apiKey}`;
+    return `${this.baseURL}/weather?lat=${coordinates.latitude}&lon=${coordinates.longitude}&appid=${this.apiKey}`;
   }
 
   private async fetchAndDestructureLocationData(): Promise<Coordinates | null> {
